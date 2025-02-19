@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Hotel Booking Cancellation Prediction</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+            .loader {
+                border: 4px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                border-top: 4px solid #6366f1;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+            }
+            .animate-fade-in {
+                animation: fadeIn 0.3s ease-in;
+            }
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+    </head>
+    <body class="bg-gradient-to-br from-indigo-100 to-blue-50 min-h-screen font-sans">
+        <div class="container mx-auto px-4 py-12">
+            <div class="glass-effect max-w-4xl mx-auto rounded-2xl shadow-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-indigo-600 to-blue-500 p-6">
+                    <h2 class="text-3xl font-bold text-white text-center">🏨 Hotel Booking Cancellation Predictor</h2>
+                </div>
+
+                <form id="predictionForm" class="grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
+                    <!-- Left Column -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-1">📅 Reservation Date</label>
+                            <input type="date" name="date_of_reservation" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200" />
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-600 mb-1">👨👩 Adults</label>
+                                <input type="number" name="number_of_adults" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-600 mb-1">👧👦 Children</label>
+                                <input type="number" name="number_of_children" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200" />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-600 mb-1">🌜 Weekend Nights</label>
+                                <input type="number" name="number_of_weekend_nights" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-600 mb-1">🌞 Week Nights</label>
+                                <input type="number" name="number_of_week_nights" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-1">⏳ Lead Time (days)</label>
+                            <input type="number" step="0.1" name="lead_time" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-1">💰 Average Price</label>
+                            <input type="number" step="0.01" name="average_price" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-1">🎁 Special Requests</label>
+                            <input type="number" name="special_requests" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200" />
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-1">📉 Previous Cancellations</label>
+                            <input type="number" step="0.1" name="pc" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-1">✅ Previous Not Cancelled</label>
+                            <input type="number" step="0.1" name="p_not_c" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200" />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-1">🍽 Meal Type</label>
+                            <select name="type_of_meal" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200">
+                                <option value="Meal Plan 1">🍳 Meal Plan 1</option>
+                                <option value="Meal Plan 2">🍲 Meal Plan 2</option>
+                                <option value="Meal Plan 3">🥗 Meal Plan 3</option>
+                                <option value="Not Selected">🚫 Not Selected</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-1">🛏 Room Type</label>
+                            <select name="room_type" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200">
+                                <option value="Room_Type 1">Room Type 1</option>
+                                <option value="Room_Type 2">Room Type 2</option>
+                                <option value="Room_Type 3">Room Type 3</option>
+                                <option value="Room_Type 4">Room Type 4</option>
+                                <option value="Room_Type 5">Room Type 5</option>
+                                <option value="Room_Type 6">Room Type 6</option>
+                                <option value="Room_Type 7">Room Type 7</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-600 mb-1">📊 Market Segment</label>
+                            <select name="market_segment_type" required class="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition duration-200">
+                                <option value="Online">🌐 Online</option>
+                                <option value="Offline">🏪 Offline</option>
+                                <option value="Corporate">🏢 Corporate</option>
+                                <option value="Complementary">🎁 Complementary</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                <input type="checkbox" name="repeated" value="1" class="h-5 w-5 text-indigo-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-indigo-200" id="repeated" />
+                                <label for="repeated" class="text-sm font-semibold text-gray-600">🔄 Repeated Guest</label>
+                            </div>
+
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                                <input type="checkbox" name="car_parking_space" value="1" class="h-5 w-5 text-indigo-600 border-2 border-gray-300 rounded focus:ring-2 focus:ring-indigo-200" id="carParking" />
+                                <label for="carParking" class="text-sm font-semibold text-gray-600">🅿️ Car Parking</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2 pt-6">
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-indigo-200">📊 Predict Cancellation Probability</button>
+                    </div>
+                </form>
+
+                <div id="loader" class="hidden fixed inset-0 bg-black bg-opacity-20 backdrop-blur-sm flex items-center justify-center">
+                    <div class="loader"></div>
+                </div>
+
+                <div id="result" class="px-8 pb-8"></div>
+            </div>
+        </div>
+
+        <script>
+            const form = document.getElementById("predictionForm");
+            const loader = document.getElementById("loader");
+            const resultDiv = document.getElementById("result");
+
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                loader.classList.remove("hidden");
+
+                const formData = new FormData(form);
+
+                fetch("/predict", {
+                    method: "POST",
+                    body: formData,
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        loader.classList.add("hidden");
+                        resultDiv.innerHTML = `
+                    <div class="animate-fade-in p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center space-x-3">
+                        ✅ ${data.prediction}
+                    </div>
+                `;
+                    })
+                    .catch((error) => {
+                        loader.classList.add("hidden");
+                        resultDiv.innerHTML = `
+                    <div class="animate-fade-in p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 flex items-center space-x-3">
+                        ❌ Error: ${error.message || "Failed to get prediction"}
+                    </div>
+                `;
+                    });
+            });
+        </script>
+    </body>
+</html>
