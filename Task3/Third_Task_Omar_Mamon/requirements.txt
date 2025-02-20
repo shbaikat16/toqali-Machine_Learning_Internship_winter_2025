@@ -1,0 +1,14 @@
+﻿Flask
+joblib
+numpy
+pandas
+matplotlib
+seaborn
+scipy
+scikit-learn
+imbalanced-learn
+statsmodels
+gunicorn
+Jinja2
+Werkzeug
+MarkupSafe
