@@ -2,12 +2,14 @@ from flask import Flask, request, render_template
 import joblib
 import numpy as np
 import pandas as pd
+import os
 from datetime import datetime
 
 app = Flask(__name__)
 
 # Load the trained Random Forest model
-model = joblib.load("./model/rf_model.pkl")
+model_path = os.path.join(os.path.dirname(__file__), "model", "rf_model.pkl")
+model = joblib.load(model_path)
 
 @app.route('/')
 def home():
