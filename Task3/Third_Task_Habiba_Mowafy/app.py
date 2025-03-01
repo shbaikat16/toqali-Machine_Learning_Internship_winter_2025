@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 import joblib
 import numpy as np
 
@@ -8,6 +8,10 @@ app = Flask(__name__)
 model = joblib.load("random_forest_model.pkl")
 
 @app.route('/')
+def welcome():
+    return render_template('welcome.html')
+
+@app.route('/form')
 def home():
     return render_template('index.html')
 
@@ -17,10 +21,27 @@ def predict():
         # Get form data
         data = request.form
         
-        # Process inputs
-        lead_time = int(data.get('lead_time', 0))
-        special_requests = int(data.get('special_request', 0))
-        reservation_month = int(data.get('reservation_month', 1))
+        # Process inputs with better error handling
+        def safe_int(value, default=0):
+            try:
+                return int(value) if value != '' else default
+            except (ValueError, TypeError):
+                return default
+                
+        def safe_float(value, default=0.0):
+            try:
+                return float(value) if value != '' else default
+            except (ValueError, TypeError):
+                return default
+        
+        # Process inputs including new fields with safe conversion
+        lead_time = safe_int(data.get('lead_time'))
+        special_requests = safe_int(data.get('special_request'))
+        reservation_month = safe_int(data.get('reservation_month', 1))
+        booking_id = safe_int(data.get('Booking_ID'))
+        num_adults = safe_int(data.get('no_of_adult'))
+        num_children = safe_int(data.get('No_of_children'))
+        avg_price = safe_float(data.get('average_price'))
         
         # Process room type - map from string to int
         room_type_mapping = {
@@ -31,13 +52,16 @@ def predict():
         
         # Process boolean inputs
         regular_customer = 1 if data.get('regular_customer') == 'on' else 0
-        car_parking_space = int(data.get('car_parking', 0))
+        car_parking_space = 1 if data.get('car_parking') == '1' else 0
         is_weekend = 1 if data.get('is_weekend') == 'on' else 0
+        weekend_days = safe_int(data.get('weekend_day_input')) if is_weekend else 0
         
-        # Calculate percent_can from cancellation history
-        prev_canceled = int(data.get('prev_canceled', 0))
-        prev_not_canceled = int(data.get('prev_not_canceled', 0))
-        percent_can = prev_canceled / (prev_canceled + prev_not_canceled + 1e-10)
+        # Calculate percent_can from cancellation history with safe conversion
+        prev_canceled = safe_int(data.get('prev_canceled'))
+        prev_not_canceled = safe_int(data.get('prev_not_canceled'))
+        # Avoid division by zero
+        total_reservations = prev_canceled + prev_not_canceled
+        percent_can = prev_canceled / (total_reservations + 1e-10) if total_reservations > 0 else 0
         
         # Process market segment
         market_segment = data.get('market_segment', 'Online')
@@ -48,21 +72,20 @@ def predict():
             'Market_Online': 1 if market_segment == 'Online' else 0
         }
         
-        # Process meal type - ignore 'Not Selected' and 'Meal Plan 3'
+        # Process meal type
         meal_type = data.get('meal_type', 'Meal Plan 1')
         meal_features = {
             'MealType_Meal Plan 1': 1 if meal_type == 'Meal Plan 1' else 0,
             'MealType_Meal Plan 2': 1 if meal_type == 'Meal Plan 2' else 0
         }
         
-        # Create feature array
+        # Create feature array with original features
         feature_names = ['car parking space', 'room type', 'lead time', 'regular customer', 
-                         'special requests', 'reservation_month', 'Market_Complementary', 
-                         'Market_Corporate', 'Market_Offline', 'Market_Online', 
-                         'MealType_Meal Plan 1', 'MealType_Meal Plan 2', 
-                         'percent_can', 'is_weekend']
+                        'special requests', 'reservation_month', 'Market_Complementary', 
+                        'Market_Corporate', 'Market_Offline', 'Market_Online', 
+                        'MealType_Meal Plan 1', 'MealType_Meal Plan 2', 
+                        'percent_can', 'is_weekend']
         
-        # Create the features dictionary with all values
         features_dict = {
             'car parking space': car_parking_space,
             'room type': room_type,
@@ -90,7 +113,7 @@ def predict():
         prediction = model.predict(features_array)[0]
         
         # Convert prediction to text
-        result = "Not Canceled" if prediction else "Canceled"
+        result = "Not Cancelled" if prediction else "Cancelled"
         
         return render_template("index.html", prediction=result)
     

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Booking Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Hotel Booking Status Prediction</h1>
+        <form action="/predict" method="POST">
+            <div class="form-grid">
+                <!-- Number of Adults -->
+                <div class="form-group">
+                    <label for="number_of_adults">Number of Adults:</label>
+                    <input type="number" id="number_of_adults" name="number_of_adults" min="0" required>
+                </div>
+
+                <!-- Number of Children -->
+                <div class="form-group">
+                    <label for="number_of_children">Number of Children:</label>
+                    <input type="number" id="number_of_children" name="number_of_children" min="0" required>
+                </div>
+
+                <!-- Number of Weekend Nights -->
+                <div class="form-group">
+                    <label for="number_of_weekend_nights">Number of Weekend Nights:</label>
+                    <input type="number" id="number_of_weekend_nights" name="number_of_weekend_nights" min="0" required>
+                </div>
+
+                <!-- Number of Week Nights -->
+                <div class="form-group">
+                    <label for="number_of_week_nights">Number of Week Nights:</label>
+                    <input type="number" id="number_of_week_nights" name="number_of_week_nights" min="0" required>
+                </div>
+
+                <!-- Type of Meal -->
+                <div class="form-group">
+                    <label for="type_of_meal">Type of Meal:</label>
+                    <select id="type_of_meal" name="type_of_meal" required>
+                        <option value="1">Meal Plan 1</option>
+                        <option value="2">Meal Plan 2</option>
+                        <option value="3">Meal Plan 3</option>
+                        <option value="0">Not Selected</option>
+                    </select>
+                </div>
+
+                <!-- Room Type -->
+                <div class="form-group">
+                    <label for="room_type">Room Type:</label>
+                    <select id="room_type" name="room_type" required>
+                        <option value="1">Room_Type 1</option>
+                        <option value="2">Room_Type 2</option>
+                        <option value="3">Room_Type 3</option>
+                        <option value="4">Room_Type 4</option>
+                        <option value="5">Room_Type 5</option>
+                        <option value="6">Room_Type 6</option>
+                        <option value="7">Room_Type 7</option>
+                    </select>
+                </div>
+
+                <!-- Lead Time -->
+                <div class="form-group">
+                    <label for="lead_time">Lead Time:</label>
+                    <input type="number" id="lead_time" name="lead_time" min="0" required>
+                </div>
+
+                <!-- Market Segment Type -->
+                <div class="form-group">
+                    <label for="market_segment_type">Market Segment Type:</label>
+                    <select id="market_segment_type" name="market_segment_type" required>
+                        <option value="1">Online</option>
+                        <option value="2">Offline</option>
+                        <option value="3">Corporate</option>
+                        <option value="4">Complementary</option>
+                        <option value="5">Aviation</option>
+                    </select>
+                </div>
+
+                <!-- P-C -->
+                <div class="form-group">
+                    <label for="P_C">P-C:</label>
+                    <input type="text" id="P_C" name="P_C" required>
+                </div>
+
+                <!-- P-not-C -->
+                <div class="form-group">
+                    <label for="P-not-C">P-not-C:</label>
+                    <input type="text" id="P-not-C" name="P-not-C" required>
+                </div>
+
+                <!-- Average Price -->
+                <div class="form-group">
+                    <label for="average_price">Average Price:</label>
+                    <input type="number" step="0.01" id="average_price" name="average_price" min="0" required>
+                </div>
+
+                <!-- Special Requests -->
+                <div class="form-group">
+                    <label for="special_requests">Special Requests:</label>
+                    <input type="number" id="special_requests" name="special_requests" min="0" required>
+                </div>
+
+                <!-- Reservation Day -->
+                <div class="form-group">
+                    <label for="reservation_day">Reservation Day:</label>
+                    <select id="reservation_day" name="reservation_day" required>
+                        <option value="">Select Day</option>
+                        <!-- JavaScript سيولد الأيام تلقائيًا من 1 إلى 31 -->
+                    </select>
+                </div>
+
+                <!-- Reservation Month -->
+                <div class="form-group">
+                    <label for="reservation_month">Reservation Month:</label>
+                    <select id="reservation_month" name="reservation_month" required>
+                        <option value="">Select Month</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+
+                <!-- Reservation Year -->
+                <div class="form-group">
+                    <label for="reservation_year">Reservation Year:</label>
+                    <select id="reservation_year" name="reservation_year" required>
+                        <option value="">Select Year</option>
+                        <!-- JavaScript سيولد السنوات تلقائيًا من 2023 إلى 2030 -->
+                    </select>
+                </div>
+            </div>
+            <button type="submit">Predict Booking Status</button>
+        </form>
+
+        <!-- Display Prediction Result -->
+        {% if prediction_text %}
+            <div class="prediction-result">
+                <h2>{{ prediction_text }}</h2>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- JavaScript لإنشاء الأيام والسنوات ديناميكيًا -->
+    <script>
+        // إنشاء الأيام والسنوات
+        const daySelect = document.getElementById('reservation_day');
+        const monthSelect = document.getElementById('reservation_month');
+        const yearSelect = document.getElementById('reservation_year');
+
+        // إنشاء الأيام من 1 إلى 31
+        function createDays(maxDays) {
+            daySelect.innerHTML = '<option value="">Select Day</option>';
+            for (let day = 1; day <= maxDays; day++) {
+                const option = document.createElement('option');
+                option.value = day;
+                option.textContent = day;
+                daySelect.appendChild(option);
+            }
+        }
+
+        // إنشاء السنوات من 2023 إلى 2030
+        for (let year = 2023; year <= 2030; year++) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearSelect.appendChild(option);
+        }
+
+        // تحديث عدد الأيام عند تغيير الشهر
+        monthSelect.addEventListener('change', () => {
+            const month = parseInt(monthSelect.value);
+            let maxDays = 31;
+
+            if (month === 2) { // فبراير
+                maxDays = 28;
+            } else if ([4, 6, 9, 11].includes(month)) { // أبريل، يونيو، سبتمبر، نوفمبر
+                maxDays = 30;
+            }
+
+            createDays(maxDays);
+        });
+
+        // تهيئة الأيام عند التحميل
+        createDays(31);
+    </script>
+</body>
+</html>
